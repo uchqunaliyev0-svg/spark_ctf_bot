@@ -15,38 +15,41 @@ class Register(StatesGroup):
 @router.message(Command("start"))
 async def start_cmd(message: types.Message, state: FSMContext):
     user = await get_user(message.from_user.id)
-    
     if not user:
-        await message.answer("🌐 Tilni tanlang / Выберите язык / Choose language:", 
-                             reply_markup=get_lang_keyboard())
+        await message.answer(
+            "🌐 Tilni tanlang / Выберите язык / Choose language:", 
+            reply_markup=get_lang_keyboard()
+        )
         await state.set_state(Register.language)
     else:
-        # Indeks bo'yicha olish: user[3] bu language, user[1] bu nickname
+        # Bazadan tilni olamiz (index 3)
         lang = user[3] if len(user) > 3 else "uz"
-        nick = user[1]
-        
-        welcome_msgs = {
-            "uz": f"🔥 Qaytganingiz bilan, {nick}!",
-            "ru": f"🔥 С возвращением, {nick}!",
-            "en": f"🔥 Welcome back, {nick}!"
-        }
-        
-        await message.answer(welcome_msgs.get(lang, welcome_msgs["uz"]), 
-                             reply_markup=get_main_menu(lang))
+        await message.answer(
+            f"🚀 Spark CTF-ga xush kelibsiz!", 
+            reply_markup=get_main_menu(lang)
+        )
 
-@router.callback_query(F.data.startswith("lang_"))
-async def set_lang(callback: types.CallbackQuery, state: FSMContext):
-    lang = callback.data.split("_")[1]
+@router.message(Register.language)
+async def set_lang(message: types.Message, state: FSMContext):
+    text = message.text
+    # Tilni aniqlash mantiqi
+    if "Русский" in text:
+        lang = "ru"
+    elif "English" in text:
+        lang = "en"
+    else:
+        lang = "uz"
+    
     await state.update_data(language=lang)
     
     msgs = {
-        "uz": "Ismingiz yoki Nickname kiriting:", 
-        "ru": "Введите никнейм:", 
-        "en": "Enter your nickname:"
+        "uz": "Nickname yoki ismingizni kiriting:", 
+        "ru": "Введите никнейм или ваше имя:", 
+        "en": "Enter your nickname or name:"
     }
-    await callback.message.answer(msgs[lang])
+    # Keyingi qadamda klaviaturani o'chirib turamiz
+    await message.answer(msgs[lang], reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(Register.nickname)
-    await callback.answer()
 
 @router.message(Register.nickname)
 async def set_nickname(message: types.Message, state: FSMContext):
@@ -54,29 +57,33 @@ async def set_nickname(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data['language']
     
+    # Davlatlar uchun ham tugma chiqaramiz
+    kb = [
+        [KeyboardButton(text="🇺🇿 O'zbekiston")],
+        [KeyboardButton(text="🇷🇺 Rossiya")],
+        [KeyboardButton(text="🇺🇸 AQSH")]
+    ]
+    markup = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
+    
     msgs = {
-        "uz": "Davlatni kiriting (Masalan: 🇺🇿 O'zbekiston):", 
-        "ru": "Введите страну (Например: 🇷🇺 Россия):", 
-        "en": "Enter your country (e.g. 🇺🇸 USA):"
+        "uz": "Davlatni tanlang yoki yozing:", 
+        "ru": "Выберите или введите страну:", 
+        "en": "Select or enter country:"
     }
-    await message.answer(msgs[lang])
+    await message.answer(msgs[lang], reply_markup=markup)
     await state.set_state(Register.country)
 
 @router.message(Register.country)
 async def set_country(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    user_id = message.from_user.id
     lang = data['language']
-    nickname = data['nickname']
-    country = message.text
-    
-    # Bazaga yozish
-    await add_user(user_id, nickname, country, lang)
+    # Bazaga hamma ma'lumotni saqlaymiz
+    await add_user(message.from_user.id, data['nickname'], message.text, lang)
     await state.clear()
     
-    final_msgs = {
+    msgs = {
         "uz": "Tayyor! ✅ Endi menyudan foydalanishingiz mumkin.", 
         "ru": "Готово! ✅ Теперь вы можете использовать меню.", 
         "en": "Done! ✅ Now you can use the menu."
     }
-    await message.answer(final_msgs[lang], reply_markup=get_main_menu(lang))
+    await message.answer(msgs[lang], reply_markup=get_main_menu(lang))

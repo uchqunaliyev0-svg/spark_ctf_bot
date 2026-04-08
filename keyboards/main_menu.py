@@ -1,25 +1,34 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 def get_lang_keyboard():
-    buttons = [
-        [InlineKeyboardButton(text="🇺🇿 O'zbekcha", callback_data="lang_uz")],
-        [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru")],
-        [InlineKeyboardButton(text="🇺🇸 English", callback_data="lang_en")]
+    # Tillarni tanlash menyusi (pastdan chiqadi)
+    kb = [
+        [KeyboardButton(text="🇺🇿 O'zbekcha"), KeyboardButton(text="🇷🇺 Русский")],
+        [KeyboardButton(text="🇺🇸 English")]
     ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
+    return ReplyKeyboardMarkup(
+        keyboard=kb, 
+        resize_keyboard=True, 
+        one_time_keyboard=True
+    )
 
 def get_main_menu(lang):
+    # Tillarga qarab menyu matnlari
     texts = {
         "uz": ["🚀 Topshiriqlar", "👤 Profil", "🏆 Reyting", "ℹ️ Ma'lumot"],
         "ru": ["🚀 Задания", "👤 Профиль", "🏆 Рейтинг", "ℹ️ Инфо"],
         "en": ["🚀 Tasks", "👤 Profile", "🏆 Ranking", "ℹ️ Info"]
     }
-    t = texts[lang]
-    buttons = [
-        [InlineKeyboardButton(text=t[0], callback_data="tasks")],
-        [InlineKeyboardButton(text=t[1], callback_data="profile"),
-         InlineKeyboardButton(text=t[2], callback_data="ranking")],
-        [InlineKeyboardButton(text=t[3], callback_data="about")]
+    
+    # Agar til kutilmagan bo'lsa, o'zbekcha beradi
+    t = texts.get(lang, texts["uz"])
+    
+    kb = [
+        [KeyboardButton(text=t[0])],
+        [KeyboardButton(text=t[1]), KeyboardButton(text=t[2])],
+        [KeyboardButton(text=t[3])]
     ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
+    return ReplyKeyboardMarkup(
+        keyboard=kb, 
+        resize_keyboard=True
+    )
