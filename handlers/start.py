@@ -1,89 +1,38 @@
-from aiogram import Router, types, F
+from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from database import get_user, add_user
-from keyboards.main_menu import get_lang_keyboard, get_main_menu
+from keyboards.main_menu import get_main_menu
 
 router = Router()
 
 class Register(StatesGroup):
-    language = State()
     nickname = State()
-    country = State()
 
 @router.message(Command("start"))
 async def start_cmd(message: types.Message, state: FSMContext):
     user = await get_user(message.from_user.id)
     if not user:
+        await message.answer("👾")
         await message.answer(
-            "🌐 Tilni tanlang / Выберите язык / Choose language:", 
-            reply_markup=get_lang_keyboard()
+            "Welcome, Agent! 🕵️‍♂️\n\n"
+            "Systems are online. To initialize your profile, please enter your **Hacker Nickname** below:"
         )
-        await state.set_state(Register.language)
+        await state.set_state(Register.nickname)
     else:
-        # Bazadan tilni olamiz (index 3)
-        lang = user[3] if len(user) > 3 else "uz"
-        await message.answer(
-            f"🚀 Spark CTF-ga xush kelibsiz!", 
-            reply_markup=get_main_menu(lang)
-        )
-
-@router.message(Register.language)
-async def set_lang(message: types.Message, state: FSMContext):
-    text = message.text
-    # Tilni aniqlash mantiqi
-    if "Русский" in text:
-        lang = "ru"
-    elif "English" in text:
-        lang = "en"
-    else:
-        lang = "uz"
-    
-    await state.update_data(language=lang)
-    
-    msgs = {
-        "uz": "Nickname yoki ismingizni kiriting:", 
-        "ru": "Введите никнейм или ваше имя:", 
-        "en": "Enter your nickname or name:"
-    }
-    # Keyingi qadamda klaviaturani o'chirib turamiz
-    await message.answer(msgs[lang], reply_markup=types.ReplyKeyboardRemove())
-    await state.set_state(Register.nickname)
+        await message.answer(f"Welcome back, **{user[1]}**! System ready for exploitation. ⚡️", reply_markup=get_main_menu())
 
 @router.message(Register.nickname)
 async def set_nickname(message: types.Message, state: FSMContext):
-    await state.update_data(nickname=message.text)
-    data = await state.get_data()
-    lang = data['language']
-    
-    # Davlatlar uchun ham tugma chiqaramiz
-    kb = [
-        [KeyboardButton(text="🇺🇿 O'zbekiston")],
-        [KeyboardButton(text="🇷🇺 Rossiya")],
-        [KeyboardButton(text="🇺🇸 AQSH")]
-    ]
-    markup = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
-    
-    msgs = {
-        "uz": "Davlatni tanlang yoki yozing:", 
-        "ru": "Выберите или введите страну:", 
-        "en": "Select or enter country:"
-    }
-    await message.answer(msgs[lang], reply_markup=markup)
-    await state.set_state(Register.country)
-
-@router.message(Register.country)
-async def set_country(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data['language']
-    # Bazaga hamma ma'lumotni saqlaymiz
-    await add_user(message.from_user.id, data['nickname'], message.text, lang)
+    nick = message.text
+    if len(nick) > 15:
+        await message.answer("❌ Error: Nickname is too long! (Max 15 chars)")
+        return
+    await add_user(message.from_user.id, nick)
     await state.clear()
-    
-    msgs = {
-        "uz": "Tayyor! ✅ Endi menyudan foydalanishingiz mumkin.", 
-        "ru": "Готово! ✅ Теперь вы можете использовать меню.", 
-        "en": "Done! ✅ Now you can use the menu."
-    }
-    await message.answer(msgs[lang], reply_markup=get_main_menu(lang))
+    await message.answer("✅")
+    await message.answer(
+        f"Access Granted! 🔓\n\nYour identity: **{nick}**\nGo to **🚩 Tasks** to start your mission.", 
+        reply_markup=get_main_menu()
+    )
