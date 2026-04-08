@@ -1,4 +1,4 @@
-kfrom aiogram import Router, types, F
+from aiogram import Router, types, F
 from aiogram.filters import Command
 from database import get_user, add_user, db  # db bu yerda count uchun kerak
 from keyboards.main_menu import get_main_menu
