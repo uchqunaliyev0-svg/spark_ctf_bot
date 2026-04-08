@@ -1,4 +1,4 @@
-kfrom aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 def get_lang_keyboard():
     kb = [
