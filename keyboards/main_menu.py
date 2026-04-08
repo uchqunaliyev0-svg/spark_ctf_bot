@@ -1,14 +1,10 @@
-from aiogram import types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+kkfrom aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def get_main_menu():
-    # Mana bu qator senda tushib qolgan:
-    builder = ReplyKeyboardBuilder()
-    
-    # Endi builder mavjud, unga qator qo'shsak bo'ladi:
-    builder.row(types.KeyboardButton(text="🚩 Topshiriqlar"))
-    builder.row(
-        types.KeyboardButton(text="👤 Profil"), 
-        types.KeyboardButton(text="📈 Reyting")
-    )
-    return builder.as_markup(resize_keyboard=True)
+    buttons = [
+        [InlineKeyboardButton(text="🚀 Topshiriqlar", callback_data="tasks")],
+        [InlineKeyboardButton(text="👤 Profil", callback_data="profile"),
+         InlineKeyboardButton(text="🏆 Reyting", callback_data="ranking")],
+        [InlineKeyboardButton(text="ℹ️ Biz haqimizda", callback_data="about")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
