@@ -31,9 +31,3 @@ async def get_user(user_id):
     row = await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
     await conn.close()
     return row
-
-async def count_users():
-    conn = await asyncpg.connect(DATABASE_URL)
-    count = await conn.fetchval('SELECT COUNT(*) FROM users')
-    await conn.close()
-    return count
