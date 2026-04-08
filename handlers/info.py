@@ -6,9 +6,7 @@ router = Router()
 async def show_info(message: types.Message):
     text = (
         "🤖 **Spark CTF Bot**\n\n"
-        "This bot is designed to test your cybersecurity skills.\n\n"
-        "🚩 **Flag Format:** `SPARK{flag_here}`\n"
-        "👤 **Owner:** @uchqun_aliyev\n\n"
-        "Stay sharp, hacker! ⚡️"
+        "Flag formati: `SPARK{flag_nomi}`\n"
+        "Tuzuvchi: @uchqun_aliyev"
     )
     await message.answer(text, parse_mode="Markdown")
