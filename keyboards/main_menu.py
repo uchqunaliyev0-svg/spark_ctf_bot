@@ -19,6 +19,4 @@ def get_main_menu(lang):
         [KeyboardButton(text=t[1]), KeyboardButton(text=t[2])],
         [KeyboardButton(text=t[3])]
     ]
-    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)o
-
-
+    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
