@@ -3,26 +3,21 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import TOKEN
 from database import init_db
-from handlers import start, profile, tasks, info # info qo'shildi
+from handlers import start, profile, tasks, info, ranking
 
 async def main():
-    # Bazani ishga tushiramiz
     await init_db()
-
-    # FSM uchun xotira ajratamiz
-    storage = MemoryStorage()
     bot = Bot(token=TOKEN)
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(storage=MemoryStorage())
 
-    # Routerlarni tartib bilan ulaymiz
+    # Routerlarni to'g'ri tartibda ulash
     dp.include_router(start.router)
     dp.include_router(profile.router)
     dp.include_router(tasks.router)
-    dp.include_router(info.router) # info ulandi
+    dp.include_router(info.router)
+    dp.include_router(ranking.router)
 
-    print("Spark CTF bot ishga tushdi...")
-    
-    # Eski xabarlarni o'tkazib yuborish (bot yoqilganda qotib qolmasligi uchun)
+    print("Spark CTF bot is online...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
