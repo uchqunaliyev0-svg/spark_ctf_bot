@@ -1,34 +1,24 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 def get_lang_keyboard():
-    # Tillarni tanlash menyusi (pastdan chiqadi)
     kb = [
         [KeyboardButton(text="🇺🇿 O'zbekcha"), KeyboardButton(text="🇷🇺 Русский")],
         [KeyboardButton(text="🇺🇸 English")]
     ]
-    return ReplyKeyboardMarkup(
-        keyboard=kb, 
-        resize_keyboard=True, 
-        one_time_keyboard=True
-    )
+    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
 
 def get_main_menu(lang):
-    # Tillarga qarab menyu matnlari
     texts = {
         "uz": ["🚀 Topshiriqlar", "👤 Profil", "🏆 Reyting", "ℹ️ Ma'lumot"],
         "ru": ["🚀 Задания", "👤 Профиль", "🏆 Рейтинг", "ℹ️ Инфо"],
         "en": ["🚀 Tasks", "👤 Profile", "🏆 Ranking", "ℹ️ Info"]
     }
-    
-    # Agar til kutilmagan bo'lsa, o'zbekcha beradi
     t = texts.get(lang, texts["uz"])
-    
     kb = [
         [KeyboardButton(text=t[0])],
         [KeyboardButton(text=t[1]), KeyboardButton(text=t[2])],
         [KeyboardButton(text=t[3])]
     ]
-    return ReplyKeyboardMarkup(
-        keyboard=kb, 
-        resize_keyboard=True
-    )
+    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)o
+
+
