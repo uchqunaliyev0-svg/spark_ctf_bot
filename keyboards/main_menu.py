@@ -21,5 +21,5 @@ def get_main_menu(lang):
          InlineKeyboardButton(text=t[2], callback_data="ranking")],
         [InlineKeyboardButton(text=t[3], callback_data="about")]
     ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)o
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
