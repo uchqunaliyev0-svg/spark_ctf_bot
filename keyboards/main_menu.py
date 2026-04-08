@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+kfrom aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 def get_lang_keyboard():
     kb = [
@@ -9,13 +9,13 @@ def get_lang_keyboard():
 
 def get_main_menu(lang):
     texts = {
-        "uz": ["🚀 Topshiriqlar", "👤 Profil", "🏆 Reyting", "ℹ️ Ma'lumot"],
-        "ru": ["🚀 Задания", "👤 Профиль", "🏆 Рейтинг", "ℹ️ Инфо"],
-        "en": ["🚀 Tasks", "👤 Profile", "🏆 Ranking", "ℹ️ Info"]
+        "uz": ["🚩 Topshiriqlar", "👤 Profil", "🏆 Reyting", "ℹ️ Ma'lumot"],
+        "ru": ["🚩 Задания", "👤 Профиль", "🏆 Рейтинг", "ℹ️ Инфо"],
+        "en": ["🚩 Tasks", "👤 Profile", "🏆 Ranking", "ℹ️ Info"]
     }
     t = texts.get(lang, texts["uz"])
     kb = [
-        [KeyboardButton(text=t[0])],
+        [KeyboardButton(text=t[0])], # Mana shu yerda bayroqcha bo'ldi
         [KeyboardButton(text=t[1]), KeyboardButton(text=t[2])],
         [KeyboardButton(text=t[3])]
     ]
