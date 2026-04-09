@@ -50,3 +50,9 @@ async def get_top_users():
     rows = await conn.fetch('SELECT nickname, points FROM users ORDER BY points DESC LIMIT 10')
     await conn.close()
     return rows
+
+async def get_total_users():
+    async with aiosqlite.connect(DB_NAME) as db:
+        async with db.execute("SELECT COUNT(*) FROM users") as cursor:
+            row = await cursor.fetchone()
+            return row[0] if row else 0
