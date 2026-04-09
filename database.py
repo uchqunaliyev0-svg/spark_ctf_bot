@@ -1,19 +1,38 @@
-import asyncpg, os
+import asyncpg
+import os
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 async def init_db():
     conn = await asyncpg.connect(DATABASE_URL)
     # Users table
-    await conn.execute('CREATE TABLE IF NOT EXISTS users (user_id BIGINT PRIMARY KEY, nickname TEXT, points INTEGER DEFAULT 0, solved_count INTEGER DEFAULT 0)')
+    await conn.execute('''CREATE TABLE IF NOT EXISTS users (
+        user_id BIGINT PRIMARY KEY, 
+        nickname TEXT, 
+        points INTEGER DEFAULT 0,
+        solved_count INTEGER DEFAULT 0
+    )''')
     # Tasks table
-    await conn.execute('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, name TEXT, description TEXT, flag TEXT, points INTEGER)')
-    # Solves table (kim qaysi taskni yechganini saqlash uchun)
-    await conn.execute('CREATE TABLE IF NOT EXISTS solves (user_id BIGINT, task_id INTEGER, PRIMARY KEY (user_id, task_id))')
+    await conn.execute('''CREATE TABLE IF NOT EXISTS tasks (
+        id SERIAL PRIMARY KEY, 
+        title TEXT, 
+        description TEXT, 
+        points INTEGER,
+        flag TEXT
+    )''')
+    # Solves table
+    await conn.execute('''CREATE TABLE IF NOT EXISTS solves (
+        user_id BIGINT, 
+        task_id INTEGER, 
+        PRIMARY KEY (user_id, task_id)
+    )''')
     await conn.close()
 
 async def add_user(user_id, nickname):
     conn = await asyncpg.connect(DATABASE_URL)
-    await conn.execute('INSERT INTO users (user_id, nickname) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET nickname = $2', user_id, nickname)
+    await conn.execute('''INSERT INTO users (user_id, nickname) 
+                          VALUES ($1, $2) 
+                          ON CONFLICT (user_id) DO UPDATE SET nickname = $2''', user_id, nickname)
     await conn.close()
 
 async def get_user(user_id):
@@ -30,15 +49,11 @@ async def get_tasks():
 
 async def check_flag_db(user_id, submitted_flag):
     conn = await asyncpg.connect(DATABASE_URL)
-    # Flagni tekshirish
     task = await conn.fetchrow('SELECT * FROM tasks WHERE flag = $1', submitted_flag)
     if task:
-        # User avval yechganmi?
         solved = await conn.fetchrow('SELECT * FROM solves WHERE user_id = $1 AND task_id = $2', user_id, task['id'])
         if not solved:
-            # Solves-ga qo'shish
             await conn.execute('INSERT INTO solves (user_id, task_id) VALUES ($1, $2)', user_id, task['id'])
-            # User ballarini oshirish
             await conn.execute('UPDATE users SET points = points + $1, solved_count = solved_count + 1 WHERE user_id = $2', task['points'], user_id)
             await conn.close()
             return task['points']
@@ -51,16 +66,18 @@ async def get_top_users():
     await conn.close()
     return rows
 
+# --- YAngi qo'shilgan God Mode funksiyalari (PostgreSQL ga moslandi) ---
+
 async def get_total_users():
-    async with aiosqlite.connect(DB_NAME) as db:
-        async with db.execute("SELECT COUNT(*) FROM users") as cursor:
-            row = await cursor.fetchone()
-            return row[0] if row else 0
+    conn = await asyncpg.connect(DATABASE_URL)
+    count = await conn.fetchval('SELECT COUNT(*) FROM users')
+    await conn.close()
+    return count if count else 0
 
 async def add_new_task(title, description, points, flag):
-    async with aiosqlite.connect(DB_NAME) as db:
-        await db.execute(
-            "INSERT INTO tasks (title, description, points, flag) VALUES (?, ?, ?, ?)",
-            (title, description, points, flag)
-        )
-        await db.commit()
+    conn = await asyncpg.connect(DATABASE_URL)
+    await conn.execute(
+        'INSERT INTO tasks (title, description, points, flag) VALUES ($1, $2, $3, $4)',
+        title, description, points, flag
+    )
+    await conn.close()
