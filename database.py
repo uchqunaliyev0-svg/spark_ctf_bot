@@ -56,3 +56,11 @@ async def get_total_users():
         async with db.execute("SELECT COUNT(*) FROM users") as cursor:
             row = await cursor.fetchone()
             return row[0] if row else 0
+
+async def add_new_task(title, description, points, flag):
+    async with aiosqlite.connect(DB_NAME) as db:
+        await db.execute(
+            "INSERT INTO tasks (title, description, points, flag) VALUES (?, ?, ?, ?)",
+            (title, description, points, flag)
+        )
+        await db.commit()
