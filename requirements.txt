@@ -1,3 +1,6 @@
 matplotlib
 aiogram
 asyncpg
+matplotlib==3.8.0
+aiogram==3.4.1
+aiohttp==3.9.3
