@@ -1,25 +1,26 @@
-from aiogram import Router, types
-from aiogram.filters import Command
+from aiogram import Router, types, F
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from database import get_user, add_user
-from keyboards.main_menu import get_main_menu
+from database import add_user
 
 router = Router()
-class Register(StatesGroup): nickname = State()
 
-@router.message(Command("start"))
+@router.message(CommandStart(), state="*")
 async def start_cmd(message: types.Message, state: FSMContext):
-    user = await get_user(message.from_user.id)
-    if not user:
-        await message.answer("Welcome to Spark CTF.\nPlease enter your Nickname to register:")
-        await state.set_state(Register.nickname)
-    else:
-        await message.answer(f"Welcome back, {user[1]}.", reply_markup=get_main_menu())
-
-@router.message(Register.nickname)
-async def set_nickname(message: types.Message, state: FSMContext):
-    nick = message.text[:15]
-    await add_user(message.from_user.id, nick)
     await state.clear()
-    await message.answer(f"Nickname saved: {nick}", reply_markup=get_main_menu())
+    
+    # Foydalanuvchini bazaga qo'shish
+    await add_user(message.from_user.id, message.from_user.full_name)
+    
+    # Menyu tugmalari
+    kb = [
+        [types.KeyboardButton(text="🚩 Tasks"), types.KeyboardButton(text="👤 Profile")],
+        [types.KeyboardButton(text="🏆 Ranking")]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    
+    await message.answer(
+        f"Salom {message.from_user.first_name}! Spark CTF platformasiga xush kelibsan.\n"
+        "Pastdagi tugmalar orqali tasklarni yechishni boshla! 🔥",
+        reply_markup=keyboard
+    )

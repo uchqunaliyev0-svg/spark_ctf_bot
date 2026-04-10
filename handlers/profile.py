@@ -6,8 +6,7 @@ router = Router()
 
 @router.message(F.text == "👤 Profile", state="*")
 async def show_profile(message: types.Message, state: FSMContext):
-    # Har qanday holatni (state) tozalaymiz
-    await state.clear()
+    await state.clear() # Har qanday tunnelni buzadi
     
     user = await get_user(message.from_user.id)
     if not user:
@@ -18,7 +17,8 @@ async def show_profile(message: types.Message, state: FSMContext):
         f"👤 **SPARK CTF PROFILI**\n"
         f"━━━━━━━━━━━━━━━\n"
         f"🏷 **Nick:** {user['nickname']}\n"
-        f"💰 **Ballar:** {user.get('points', 0)} pt\n"
-        f"🚩 **Yechilgan:** {user.get('solved_count', 0)} ta\n"
+        f"💰 **Ballar:** {user['points']} pt\n"
+        f"🚩 **Yechilgan:** {user['solved_count']} ta\n"
+        f"🆔 **ID:** `{user['user_id']}`"
     )
     await message.answer(text, parse_mode="Markdown")

@@ -2,22 +2,20 @@ import asyncpg
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-
-# Global pool ob'ekti
 pool = None
 
 async def init_db():
     global pool
     pool = await asyncpg.create_pool(DATABASE_URL)
     async with pool.acquire() as conn:
-        # Foydalanuvchilar jadvali
+        # Users jadvali
         await conn.execute('''CREATE TABLE IF NOT EXISTS users (
             user_id BIGINT PRIMARY KEY,
             nickname TEXT,
             points INTEGER DEFAULT 0,
             solved_count INTEGER DEFAULT 0
         )''')
-        # Tasklar jadvali
+        # Tasks jadvali
         await conn.execute('''CREATE TABLE IF NOT EXISTS tasks (
             id SERIAL PRIMARY KEY,
             title TEXT,
@@ -25,7 +23,7 @@ async def init_db():
             points INTEGER,
             flag TEXT
         )''')
-        # Solves jadvali (GRAFIK UCHUN YANGILANDI)
+        # Solves jadvali (Yechilgan tasklar tarixi)
         await conn.execute('''CREATE TABLE IF NOT EXISTS solves (
             id SERIAL PRIMARY KEY,
             user_id BIGINT,
@@ -37,8 +35,8 @@ async def init_db():
 async def add_user(user_id, nickname):
     async with pool.acquire() as conn:
         await conn.execute('''INSERT INTO users (user_id, nickname)
-                              VALUES ($1, $2)
-                              ON CONFLICT (user_id) DO UPDATE SET nickname = $2''', user_id, nickname)
+                             VALUES ($1, $2)
+                             ON CONFLICT (user_id) DO UPDATE SET nickname = $2''', user_id, nickname)
 
 async def get_user(user_id):
     async with pool.acquire() as conn:
@@ -46,7 +44,7 @@ async def get_user(user_id):
 
 async def get_tasks():
     async with pool.acquire() as conn:
-        return await conn.fetch('SELECT * FROM tasks')
+        return await conn.fetch('SELECT * FROM tasks ORDER BY id DESC')
 
 async def get_top_users():
     async with pool.acquire() as conn:
@@ -54,26 +52,24 @@ async def get_top_users():
 
 async def check_flag_db(user_id, submitted_flag):
     async with pool.acquire() as conn:
+        # Flagni tekshirish
         task = await conn.fetchrow('SELECT * FROM tasks WHERE flag = $1', submitted_flag)
         if task:
             # Avval yechganligini tekshirish
             solved = await conn.fetchrow('SELECT * FROM solves WHERE user_id = $1 AND task_id = $2', user_id, task['id'])
             if not solved:
-                # 1. Solves jadvaliga yozish (GRAFIK UCHUN BALL BILAN!)
-                await conn.execute('INSERT INTO solves (user_id, task_id, points) VALUES ($1, $2, $3)', 
+                # 1. Solves jadvaliga yozish
+                await conn.execute('INSERT INTO solves (user_id, task_id, points) VALUES ($1, $2, $3)',
                                    user_id, task['id'], task['points'])
-                # 2. User balansini oshirish
-                await conn.execute('UPDATE users SET points = points + $1, solved_count = solved_count + 1 WHERE user_id = $2', 
+                # 2. User balansini yangilash
+                await conn.execute('UPDATE users SET points = points + $1, solved_count = solved_count + 1 WHERE user_id = $2',
                                    task['points'], user_id)
                 return task['points']
         return None
 
-# --- God Mode & Stats funksiyalari ---
-
 async def get_total_users():
     async with pool.acquire() as conn:
-        count = await conn.fetchval('SELECT COUNT(*) FROM users')
-        return count if count else 0
+        return await conn.fetchval('SELECT COUNT(*) FROM users')
 
 async def add_new_task(title, description, points, flag):
     async with pool.acquire() as conn:
