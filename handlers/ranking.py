@@ -1,23 +1,24 @@
 import matplotlib.pyplot as plt
 import io
+import database  # Modul sifatida import qilish NoneType xatosini oldini oladi
 from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.types import BufferedInputFile
-from database import get_top_users, pool  # pool bazaga ulanish uchun kerak
+from database import get_top_users
 
 router = Router()
 
 @router.message(F.text == "🏆 Ranking")
 @router.message(Command("ranking"))
 async def show_ranking(message: types.Message):
-    # 1. Matnli reytingni olish
+    # 1. Matnli TOP 10 ro'yxatni olish
     users = await get_top_users()
     if not users:
-        await message.answer("Leaderboard is empty.")
+        await message.answer("📊 Leaderboard hozircha bo'sh.")
         return
 
-    # 2. Grafik uchun bazadan tarixni olish (solves jadvalidan)
-    async with pool.acquire() as conn:
+    # 2. Grafik uchun tarixni olish (database.pool orqali)
+    async with database.pool.acquire() as conn:
         rows = await conn.fetch("""
             SELECT u.nickname, s.points, s.solved_at
             FROM solves s
@@ -28,18 +29,18 @@ async def show_ranking(message: types.Message):
             ORDER BY s.solved_at ASC;
         """)
 
-    # 3. Matnli qismni tayyorlash
-    ranking_text = "🏆 **Top 10 Hackers**\n\n"
+    # 3. Matnli qismni shakllantirish
+    text = "🏆 **Top 10 Hackers**\n\n"
     for i, user in enumerate(users, 1):
-        ranking_text += f"{i}. {user['nickname']} — {user['points']} pts\n"
+        text += f"{i}. {user['nickname']} — {user['points']} pts\n"
 
+    # Agar tarix bo'sh bo'lsa (hali hech kim task yechmagan), faqat matnni yuboramiz
     if not rows:
-        # Agar hali hech kim task bajarmagan bo'lsa, faqat matnni o'zini yuboramiz
-        await message.answer(ranking_text, parse_mode="Markdown")
+        await message.answer(text, parse_mode="Markdown")
         return
 
     # 4. GRAFIK CHIZISH (Matplotlib)
-    plt.style.use('dark_background') # Qora fon
+    plt.style.use('dark_background')
     fig, ax = plt.subplots(figsize=(10, 6))
     
     user_data = {}
@@ -48,19 +49,20 @@ async def show_ranking(message: types.Message):
         if nick not in user_data:
             user_data[nick] = {'t': [], 'p': []}
         
-        # Ballarni qo'shib borish (kumulyativ)
+        # Ballarni kumulyativ (o'sib boruvchi) hisoblash
         last_p = user_data[nick]['p'][-1] if user_data[nick]['p'] else 0
         user_data[nick]['t'].append(row['solved_at'])
         user_data[nick]['p'].append(last_p + row['points'])
 
-    # Har bir foydalanuvchi uchun alohida "zina" chizig'i
+    # Har bir user uchun "zina" chizig'ini chizish
     for nick, data in user_data.items():
         ax.step(data['t'], data['p'], label=nick, where='post', linewidth=2, marker='o', markersize=4)
 
-    ax.set_title("SparkCTF: Top 10 Growth", color='#00ff00', fontsize=14)
-    ax.set_ylabel("Points")
-    ax.grid(True, linestyle='--', alpha=0.2)
-    plt.xticks(rotation=30)
+    # Grafik bezaklari
+    ax.set_title("SparkCTF: Hackers Growth", color='#00ff00', fontsize=14, pad=15)
+    ax.set_ylabel("Points", color='gray')
+    ax.grid(True, linestyle='--', alpha=0.1)
+    plt.xticks(rotation=30, fontsize=8)
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=8)
     plt.tight_layout()
 
@@ -71,10 +73,9 @@ async def show_ranking(message: types.Message):
     
     photo = BufferedInputFile(buf.read(), filename="ranking.png")
     
-    # Rasm + Matn birga ketadi
     await message.answer_photo(
         photo=photo, 
-        caption=ranking_text, 
+        caption=text, 
         parse_mode="Markdown"
     )
-    plt.close() # Xotirani tozalash
+    plt.close() # Xotirani bo'shatish
