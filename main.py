@@ -2,40 +2,47 @@ import asyncio
 import logging
 import os
 from aiogram import Bot, Dispatcher
-from handlers import start, profile, ranking, tasks, info, admin
-from database import init_db  # <--- Buni qo'shdik
+from aiogram.fsm.storage.memory import MemoryStorage
 
-# Tokenni Railway Variables'dan olamiz
-TOKEN = os.getenv("BOT_TOKEN")
+# Handlerlarni import qilish (fayllaring nomiga qarab tekshirib ol)
+from handlers import start, profile, tasks, ranking, info, admin
+from database import init_db
+
+# Loglarni sozlash (xatolarni terminalda ko'rish uchun)
+logging.basicConfig(level=logging.INFO)
 
 async def main():
-    if not TOKEN:
-        print("XATO: BOT_TOKEN topilmadi! Railway Variables'ni tekshiring.")
-        return
+    # Bot tokenni Railway o'zgaruvchilaridan oladi
+    BOT_TOKEN = os.getenv("BOT_TOKEN")
+    bot = Bot(token=BOT_TOKEN)
+    
+    # FSM uchun xotira (bu muhim)
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
 
-    # 1. Bazani va ulanishlar pulini (pool) ishga tushiramiz
-    await init_db() 
-    print("✅ Ma'lumotlar bazasi ulanishi tayyor.")
+    # Ma'lumotlar bazasini ishga tushirish (Jadvallarni yaratish)
+    await init_db()
 
-    bot = Bot(token=TOKEN)
-    dp = Dispatcher()
-
-    # 2. Routerlarni ulash
-    dp.include_router(admin.router)
+    # --- ROUTERLARNI ULASH TARTIBI (JUDA MUHIM!) ---
+    # 1. Birinchi bo'lib asosiy menyu routerlarini ulaymiz. 
+    # Shunda ular har qanday holatda (state) ham birinchi bo'lib ishlaydi.
     dp.include_router(start.router)
-    dp.include_router(profile.router)
-    dp.include_router(ranking.router)
+    dp.include_router(profile.router) # Profile har doim tepada bo'lsin
     dp.include_router(tasks.router)
+    dp.include_router(ranking.router)
     dp.include_router(info.router)
 
-    # 3. Botni ishga tushirish
-    await bot.delete_webhook(drop_pending_updates=True)
-    print("⚡️ @sparkCTF_bot is starting with Admin Mode...")
-    await dp.start_polling(bot)
+    # 2. Admin routerini ENG OXIRIDA ulaymiz.
+    # Bu orqali adminning "raqam kirit" degan so'rovi boshqa tugmalarni yeb qo'ymaydi.
+    dp.include_router(admin.router)
+
+    print("🚀 @SparkCTF_bot ishga tushdi...")
+    
+    # Pollingni boshlash
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await bot.session.close()
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.info("Bot to'xtatildi")
+    asyncio.run(main())
