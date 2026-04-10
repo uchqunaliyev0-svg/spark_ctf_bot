@@ -5,25 +5,27 @@ from database import get_user
 
 router = Router()
 
-@router.message(F.text == "👤 Profile")
-@router.message(Command("profile"))
+# DIQQAT: state="*" qo'shdik. Bu user har qanday tunnelda (state) 
+# bo'lganida ham Profil tugmasi ishlashini ta'minlaydi.
+@router.message(F.text == "👤 Profile", state="*")
+@router.message(Command("profile"), state="*")
 async def show_profile(message: types.Message, state: FSMContext):
-    # 1. MUHIM: Har qanday FSM holatini tozalaymiz (Tunneldan chiqarish)
+    # 1. MUHIM: Har qanday FSM holatini (masalan, task qo'shishni) tozalaymiz
     await state.clear()
 
     user_id = message.from_user.id
     user = await get_user(user_id)
 
     if not user:
-        await message.answer("⚠️ Profil ma'lumotlari topilmadi. Iltimos, botni qayta ishga tushirish uchun /start bosing.")
+        await message.answer("⚠️ Profil ma'lumotlari topilmadi. Iltimos, /start bosing.")
         return
 
-    # 2. Ma'lumotlarni bazadan olish (database.py dagi get_user natijasiga qarab)
+    # 2. Ma'lumotlarni bazadan olish
     nickname = user['nickname']
     points = user.get('points', 0)
     solved = user.get('solved_count', 0)
 
-    # 3. Profil darajasini aniqlash (shunchaki qiziqish uchun qo'shdim)
+    # 3. Profil darajasini aniqlash
     if points < 500:
         rank = "Newbie 🐣"
     elif points < 1500:
