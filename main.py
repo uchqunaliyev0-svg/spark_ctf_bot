@@ -13,14 +13,14 @@ async def main():
     dp = Dispatcher(storage=MemoryStorage())
     await init_db()
 
-    # Routerlarni ulash
+    # Routerlarni tartib bilan ulaymiz
     dp.include_router(start.router)
     dp.include_router(profile.router)
     dp.include_router(tasks.router)
     dp.include_router(ranking.router)
     dp.include_router(info.router)
-    dp.include_router(rename.router) # Rename router qo'shildi
-    dp.include_router(admin.router)
+    dp.include_router(rename.router)
+    dp.include_router(admin.router) # Admin routeri shu yerda!
 
     print("🚀 SPARK CTF IS LIVE!")
     await dp.start_polling(bot)
