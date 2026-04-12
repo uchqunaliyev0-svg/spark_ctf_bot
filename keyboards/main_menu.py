@@ -1,9 +1,8 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram import types
 
 def get_main_menu():
     kb = [
-        [KeyboardButton(text="🚩 Tasks")],
-        [KeyboardButton(text="👤 Profile"), KeyboardButton(text="🏆 Ranking")],
-        [KeyboardButton(text="ℹ️ Info")]
+        [types.KeyboardButton(text="🚩 Tasks"), types.KeyboardButton(text="👤 Profile")],
+        [types.KeyboardButton(text="🏆 Ranking"), types.KeyboardButton(text="ℹ️ Info")]
     ]
-    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    return types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)

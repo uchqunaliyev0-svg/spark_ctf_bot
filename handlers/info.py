@@ -1,19 +1,17 @@
 from aiogram import Router, types, F
-from aiogram.fsm.context import FSMContext
 
 router = Router()
 
 @router.message(F.text == "ℹ️ Info")
 @router.message(F.text == "/info")
-async def show_info(message: types.Message, state: FSMContext):
-    await state.clear()
+async def info_handler(message: types.Message):
     text = (
         "🚀 **SPARK CTF PLATFORM**\n"
         "━━━━━━━━━━━━━━━\n"
-        "This bot is designed for cybersecurity enthusiasts to practice "
-        "their skills through Capture The Flag (CTF) challenges.\n\n"
-        "👨‍💻 **Developer:** @uchqun_aliyev\n"
-        "🛡 **Version:** 2.0 (Stable)\n"
-        "📍 **University:** Cyber University, Tashkent"
+        "Welcome to the next generation of CTF bots. Practice your skills, "
+        "climb the leaderboard, and become a pro pentester!\n\n"
+        "👤 **Developer:** @uchqun_aliyev\n"
+        "🛠 **Stack:** Aiogram 3.x, PostgreSQL\n"
+        "📡 **Host:** Railway Cloud"
     )
     await message.answer(text, parse_mode="Markdown")
