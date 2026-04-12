@@ -20,12 +20,15 @@ async def init_db():
             id SERIAL PRIMARY KEY, user_id BIGINT, task_id INTEGER, points INTEGER, solved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
 
-        # Bazani avtomatik yangilash (file_id va hint qo'shish)
-        try:
-            await conn.execute("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS file_id TEXT DEFAULT NULL")
-            await conn.execute("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS hint TEXT DEFAULT NULL")
-        except:
-            pass
+        # --- MAJBURIY MIGRATSIYA ---
+        # Agar jadval bor bo'lsa-yu, ustunlar bo'lmasa, ularni qo'shamiz
+        columns = await conn.fetch("SELECT column_name FROM information_schema.columns WHERE table_name = 'tasks'")
+        existing_columns = [col['column_name'] for col in columns]
+        
+        if 'file_id' not in existing_columns:
+            await conn.execute("ALTER TABLE tasks ADD COLUMN file_id TEXT DEFAULT NULL")
+        if 'hint' not in existing_columns:
+            await conn.execute("ALTER TABLE tasks ADD COLUMN hint TEXT DEFAULT NULL")
 
 async def add_user(user_id, nickname):
     async with pool.acquire() as conn:
