@@ -77,3 +77,7 @@ async def add_new_task(title, description, points, flag):
             'INSERT INTO tasks (title, description, points, flag) VALUES ($1, $2, $3, $4)',
             title, description, points, flag
         )
+
+async def delete_task_db(task_title):
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM tasks WHERE title = $1", task_title)
