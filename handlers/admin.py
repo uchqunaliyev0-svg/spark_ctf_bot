@@ -11,48 +11,34 @@ class AddTask(StatesGroup):
     waiting_for_file = State()
     waiting_for_flag = State()
 
-@router.message(F.text == "/addtask", state="*")
+@router.message(F.text == "/addtask")
 async def start_add(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer("🛠 **Add New Task**\n\nEnter Task Title:")
+    await message.answer("Enter Task Title:")
     await state.set_state(AddTask.waiting_for_title)
 
 @router.message(AddTask.waiting_for_title)
 async def process_title(message: types.Message, state: FSMContext):
-    if message.text in ["👤 Profile", "🚩 Tasks", "🏆 Ranking"]:
-        await state.clear()
-        return
     await state.update_data(title=message.text)
-    await message.answer("💰 Points (only numbers):")
+    await message.answer("Points:")
     await state.set_state(AddTask.waiting_for_points)
 
 @router.message(AddTask.waiting_for_points)
 async def process_points(message: types.Message, state: FSMContext):
-    if not message.text.isdigit():
-        await message.answer("⚠️ Send a valid number!")
-        return
     await state.update_data(points=int(message.text))
-    await message.answer("🖼 **Upload File (Image/ZIP)** or send /skip if no file needed:")
+    await message.answer("Upload File or /skip:")
     await state.set_state(AddTask.waiting_for_file)
 
 @router.message(AddTask.waiting_for_file)
 async def process_file(message: types.Message, state: FSMContext):
-    file_id = "No file"
-    if message.document:
-        file_id = message.document.file_id
-    elif message.photo:
-        file_id = message.photo[-1].file_id
-    
+    file_id = message.document.file_id if message.document else "No file"
     await state.update_data(file_id=file_id)
-    await message.answer("🚩 Enter Task Flag (e.g., SPARK{...}):")
+    await message.answer("Enter Flag:")
     await state.set_state(AddTask.waiting_for_flag)
 
 @router.message(AddTask.waiting_for_flag)
 async def process_flag(message: types.Message, state: FSMContext):
-    if message.text in ["👤 Profile", "🚩 Tasks", "🏆 Ranking"]:
-        await state.clear()
-        return
     data = await state.get_data()
-    await add_new_task(data['title'], data.get('file_id', 'None'), data['points'], message.text)
+    await add_new_task(data['title'], data['file_id'], data['points'], message.text)
     await state.clear()
-    await message.answer(f"✅ **Task Added Successfully!**\nName: {data['title']}\nPoints: {data['points']}")
+    await message.answer("✅ Task Added!")
