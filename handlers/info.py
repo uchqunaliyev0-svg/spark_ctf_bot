@@ -9,13 +9,9 @@ async def info_handler(message: types.Message):
     text = (
         "🚀 <b>SPARK CTF PLATFORM</b>\n"
         "━━━━━━━━━━━━━━━\n"
-        "This is a private CTF arena for Cyber University students.\n\n"
-        "🔹 <b>Available Commands:</b>\n"
-        "/tasks — List challenges\n"
-        "/profile — Your stats\n"
-        "/ranking — Leaderboard\n"
-        "/info — This message\n\n"
+        "🔹 <b>Flag Format:</b> <code>spark{flag_here}</code>\n"
+        "🔹 <b>Edit Nickname:</b> /rename\n\n"
         "👤 <b>Developer:</b> @uchqun_aliyev\n"
-        "🛡 <b>Status:</b> Online & Secure"
+        "🛡 <b>Status:</b> Secure Connection"
     )
     await message.answer(text, parse_mode="HTML")

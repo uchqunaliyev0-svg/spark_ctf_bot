@@ -26,6 +26,10 @@ async def get_user(user_id):
     async with pool.acquire() as conn:
         return await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
 
+async def update_user_nickname(user_id, new_nickname):
+    async with pool.acquire() as conn:
+        await conn.execute("UPDATE users SET nickname = $1 WHERE user_id = $2", new_nickname, user_id)
+
 async def get_tasks():
     async with pool.acquire() as conn:
         return await conn.fetch('SELECT * FROM tasks ORDER BY points ASC')
