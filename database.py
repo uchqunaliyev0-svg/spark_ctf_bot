@@ -18,6 +18,7 @@ async def init_db():
             id SERIAL PRIMARY KEY, user_id BIGINT, task_id INTEGER, points INTEGER, solved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
 
+# Xavfsiz parametrli so'rovlar (SQLi protection)
 async def add_user(user_id, nickname):
     async with pool.acquire() as conn:
         await conn.execute("INSERT INTO users (user_id, nickname) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET nickname = $2", user_id, nickname)
@@ -25,6 +26,10 @@ async def add_user(user_id, nickname):
 async def get_user(user_id):
     async with pool.acquire() as conn:
         return await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
+
+async def get_all_users():
+    async with pool.acquire() as conn:
+        return await conn.fetch('SELECT user_id FROM users')
 
 async def update_user_nickname(user_id, new_nickname):
     async with pool.acquire() as conn:
