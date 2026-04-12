@@ -7,15 +7,15 @@ router = Router()
 @router.message(F.text == "🚩 Tasks", state="*")
 async def show_tasks(message: types.Message, state: FSMContext):
     await state.clear()
-    
     tasks_list = await get_tasks()
+    
     if not tasks_list:
-        await message.answer("📭 Hozircha yangi tasklar yo'q. Stay tuned!")
+        await message.answer("📭 **No tasks available yet.**\nAdmin will add soon!", parse_mode="Markdown")
         return
 
-    text = "🚩 **MAVJUD TASKLAR:**\n━━━━━━━━━━━━━━━\n"
+    text = "🚩 **AVAILABLE TASKS:**\n━━━━━━━━━━━━━━━\n"
     for t in tasks_list:
-        text += f"🔹 **{t['title']}** — {t['points']} pt\n"
+        text += f"🔹 **{t['title']}** — {t['points']} pts\n"
     
-    text += "\n💡 Flagni yuborish uchun shunchaki xabarga yozing!"
+    text += "\n💡 *Submit the flag directly to claim points!*"
     await message.answer(text, parse_mode="Markdown")
