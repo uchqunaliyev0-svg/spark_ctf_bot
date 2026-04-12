@@ -9,13 +9,24 @@ async def init_db():
     pool = await asyncpg.create_pool(DATABASE_URL)
     async with pool.acquire() as conn:
         await conn.execute('''CREATE TABLE IF NOT EXISTS users (
-            user_id BIGINT PRIMARY KEY, nickname TEXT, points INTEGER DEFAULT 0, solved_count INTEGER DEFAULT 0
+            user_id BIGINT PRIMARY KEY, 
+            nickname TEXT, 
+            points INTEGER DEFAULT 0, 
+            solved_count INTEGER DEFAULT 0
         )''')
         await conn.execute('''CREATE TABLE IF NOT EXISTS tasks (
-            id SERIAL PRIMARY KEY, title TEXT, description TEXT, points INTEGER, flag TEXT
+            id SERIAL PRIMARY KEY, 
+            title TEXT, 
+            description TEXT, 
+            points INTEGER, 
+            flag TEXT
         )''')
         await conn.execute('''CREATE TABLE IF NOT EXISTS solves (
-            id SERIAL PRIMARY KEY, user_id BIGINT, task_id INTEGER, points INTEGER, solved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            id SERIAL PRIMARY KEY, 
+            user_id BIGINT, 
+            task_id INTEGER, 
+            points INTEGER, 
+            solved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
 
 async def add_user(user_id, nickname):
@@ -41,3 +52,8 @@ async def delete_task_db(task_title):
 async def clear_all_tasks():
     async with pool.acquire() as conn:
         await conn.execute("TRUNCATE TABLE tasks, solves RESTART IDENTITY")
+
+# Mana shu funksiya boya yetishmayotgan edi:
+async def get_top_users():
+    async with pool.acquire() as conn:
+        return await conn.fetch("SELECT nickname, points FROM users ORDER BY points DESC LIMIT 10")
