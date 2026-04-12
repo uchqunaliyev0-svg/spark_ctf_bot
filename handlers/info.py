@@ -7,14 +7,15 @@ router = Router()
 @router.message(Command("info"))
 async def info_handler(message: types.Message):
     text = (
-        "🚀 **SPARK CTF PLATFORM**\n"
+        "🚀 <b>SPARK CTF PLATFORM</b>\n"
         "━━━━━━━━━━━━━━━\n"
-        "This is a private CTF platform for Cyber University students.\n\n"
-        "🔹 **Commands:**\n"
-        "/tasks - List all challenges\n"
-        "/profile - Your stats\n"
-        "/ranking - Leaderboard\n\n"
-        "👤 **Developer:** @uchqun_aliyev\n"
-        "🛡 **Status:** Active"
+        "This is a private CTF arena for Cyber University students.\n\n"
+        "🔹 <b>Available Commands:</b>\n"
+        "/tasks — List challenges\n"
+        "/profile — Your stats\n"
+        "/ranking — Leaderboard\n"
+        "/info — This message\n\n"
+        "👤 <b>Developer:</b> @uchqun_aliyev\n"
+        "🛡 <b>Status:</b> Online & Secure"
     )
-    await message.answer(text, parse_mode="Markdown")
+    await message.answer(text, parse_mode="HTML")

@@ -14,23 +14,25 @@ class AddTask(StatesGroup):
 
 @router.message(Command("addtask"))
 async def start_add(message: types.Message, state: FSMContext):
-    if message.from_user.id != ADMIN_ID: return
-    await message.answer("Enter Task Title:")
+    if message.from_user.id != ADMIN_ID:
+        return
+    await state.clear()
+    await message.answer("🛠 <b>ADMIN: NEW TASK</b>\n\nEnter task title:", parse_mode="HTML")
     await state.set_state(AddTask.waiting_for_title)
 
 @router.message(AddTask.waiting_for_title)
 async def proc_title(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
-    await message.answer("Points (numbers only):")
+    await message.answer("💰 Enter points (number):")
     await state.set_state(AddTask.waiting_for_points)
 
 @router.message(AddTask.waiting_for_points)
 async def proc_points(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        await message.answer("Send a number!")
+        await message.answer("❌ Please send a number!")
         return
     await state.update_data(points=int(message.text))
-    await message.answer("Enter Flag (e.g. spark{flag_here}):")
+    await message.answer("🚩 Enter Flag (e.g. spark{flag}):")
     await state.set_state(AddTask.waiting_for_flag)
 
 @router.message(AddTask.waiting_for_flag)
@@ -38,10 +40,10 @@ async def proc_flag(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await add_new_task(data['title'], "CTF Challenge", data['points'], message.text)
     await state.clear()
-    await message.answer(f"✅ Task **{data['title']}** added!")
+    await message.answer(f"✅ <b>Task Created:</b> {data['title']}", parse_mode="HTML")
 
 @router.message(Command("clear_garbage"))
 async def clear_garbage(message: types.Message):
     if message.from_user.id == ADMIN_ID:
         await clear_all_tasks()
-        await message.answer("🧹 Database cleared!")
+        await message.answer("🧹 <b>Database is fresh!</b> All tasks cleared.", parse_mode="HTML")
