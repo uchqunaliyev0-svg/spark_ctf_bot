@@ -9,13 +9,12 @@ async def info_handler(message: types.Message):
     text = (
         "🚀 **SPARK CTF PLATFORM**\n"
         "━━━━━━━━━━━━━━━\n"
-        "Welcome to the ultimate CTF arena! This bot is built for "
-        "Cyber University students to test their hacking skills.\n\n"
-        "🔹 **How to play?**\n"
-        "1. Select a challenge in 🚩 Tasks\n"
-        "2. Find the hidden flag (format: spark{...})\n"
-        "3. Send the flag here to get points!\n\n"
+        "This is a private CTF platform for Cyber University students.\n\n"
+        "🔹 **Commands:**\n"
+        "/tasks - List all challenges\n"
+        "/profile - Your stats\n"
+        "/ranking - Leaderboard\n\n"
         "👤 **Developer:** @uchqun_aliyev\n"
-        "🛡 **Version:** 2.1 (Stable)"
+        "🛡 **Status:** Active"
     )
     await message.answer(text, parse_mode="Markdown")
