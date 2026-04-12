@@ -16,19 +16,19 @@ class AddTask(StatesGroup):
 async def start_add(message: types.Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID: return
     await state.clear()
-    await message.answer("🛠 <b>ADMIN: NEW TASK</b>\n\nEnter title:", parse_mode="HTML")
+    await message.answer("🛠 <b>ADMIN: NEW TASK</b>\n\nEnter title (e.g. Web Hacking):", parse_mode="HTML")
     await state.set_state(AddTask.waiting_for_title)
 
 @router.message(AddTask.waiting_for_title)
 async def proc_title(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
-    await message.answer("💰 Points:")
+    await message.answer("💰 Points (number only):")
     await state.set_state(AddTask.waiting_for_points)
 
 @router.message(AddTask.waiting_for_points)
 async def proc_points(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        await message.answer("❌ Send a number!")
+        await message.answer("❌ Please send a number!")
         return
     await state.update_data(points=int(message.text))
     await message.answer("🚩 Enter Flag (format: <b>SPARK{...}</b>):", parse_mode="HTML")
@@ -36,19 +36,19 @@ async def proc_points(message: types.Message, state: FSMContext):
 
 @router.message(AddTask.waiting_for_flag)
 async def proc_flag(message: types.Message, state: FSMContext):
-    # Foydalanuvchi kichik harfda yozsa ham, bazaga katta formatda saqlaymiz
+    # Flagni har doim katta harfga tekshiramiz
     flag = message.text
-    if not flag.startswith("SPARK{"):
-        await message.answer("⚠️ Flag must start with <b>SPARK{</b>!", parse_mode="HTML")
+    if not flag.startswith("SPARK{") or not flag.endswith("}"):
+        await message.answer("⚠️ Flag must follow <b>SPARK{...}</b> format!", parse_mode="HTML")
         return
-        
+    
     data = await state.get_data()
-    await add_new_task(data['title'], "Standard Challenge", data['points'], flag)
+    await add_new_task(data['title'], data['points'], flag)
     await state.clear()
-    await message.answer(f"✅ <b>Task Created:</b> {data['title']}", parse_mode="HTML")
+    await message.answer(f"✅ <b>Task Created!</b>\nTitle: {data['title']}\nPoints: {data['points']}\nFlag: <code>{flag}</code>", parse_mode="HTML")
 
 @router.message(Command("clear_garbage"))
 async def clear_garbage(message: types.Message):
     if message.from_user.id == ADMIN_ID:
         await clear_all_tasks()
-        await message.answer("🧹 Database cleared!")
+        await message.answer("🧹 <b>Database nuked!</b> All garbage removed.", parse_mode="HTML")
