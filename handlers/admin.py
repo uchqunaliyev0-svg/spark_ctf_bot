@@ -5,7 +5,7 @@ from aiogram.fsm.state import State, StatesGroup
 from database import add_new_task, clear_all_tasks
 
 router = Router()
-ADMIN_ID = 5472714251
+ADMIN_ID = 1894004023 # Sening yangi ID'ing!
 
 class AddTask(StatesGroup):
     waiting_for_title = State()
@@ -14,7 +14,8 @@ class AddTask(StatesGroup):
 
 @router.message(Command("addtask"))
 async def start_add(message: types.Message, state: FSMContext):
-    if message.from_user.id != ADMIN_ID: return
+    if message.from_user.id != ADMIN_ID:
+        return
     await state.clear()
     await message.answer("🛠 <b>ADMIN: NEW TASK</b>\nEnter task title:", parse_mode="HTML")
     await state.set_state(AddTask.waiting_for_title)
@@ -49,4 +50,4 @@ async def proc_flag(message: types.Message, state: FSMContext):
 async def clear_garbage(message: types.Message):
     if message.from_user.id == ADMIN_ID:
         await clear_all_tasks()
-        await message.answer("🧹 <b>Database Nuked!</b>", parse_mode="HTML")
+        await message.answer("🧹 <b>Database Nuked!</b> All tasks removed.", parse_mode="HTML")
