@@ -7,7 +7,7 @@ from database import get_tasks, delete_task_db, pool
 router = Router()
 ADMIN_ID = 1894004023
 
-@router.message(StateFilter("*"), F.text == "Challenges")
+@router.message(StateFilter("*"), F.text == "🎯 Challenges")
 @router.message(StateFilter("*"), Command("tasks"))
 async def show_tasks(message: types.Message, state: FSMContext):
     await state.clear()

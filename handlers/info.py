@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 router = Router()
 
-@router.message(StateFilter("*"), F.text == "Info")
+@router.message(StateFilter("*"), F.text == "ℹ️ Info")
 @router.message(StateFilter("*"), Command("info"))
 async def info_handler(message: types.Message, state: FSMContext):
     await state.clear()

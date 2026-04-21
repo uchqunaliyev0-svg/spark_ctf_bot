@@ -2,10 +2,11 @@ from aiogram import Router, types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from database import get_top_users
+from utils import generate_ranking_image
 
 router = Router()
 
-@router.message(StateFilter("*"), F.text == "Ranking")
+@router.message(StateFilter("*"), F.text == "🏆 Ranking")
 @router.message(StateFilter("*"), Command("ranking"))
 async def show_ranking(message: types.Message, state: FSMContext):
     await state.clear()
@@ -15,6 +16,9 @@ async def show_ranking(message: types.Message, state: FSMContext):
         await message.answer("🏆 <b>Global Leaderboard</b>\n\n<i>No one is on the leaderboard yet...</i>", parse_mode="HTML")
         return
 
+    # Jadval rasmini yaratish
+    image_bytes = generate_ranking_image(top)
+    
     text = "🏆 <b>Global Leaderboard</b>\n"
     text += "━━━━━━━━━━━━━━━━━━\n\n"
     
@@ -32,4 +36,8 @@ async def show_ranking(message: types.Message, state: FSMContext):
     text += "\n━━━━━━━━━━━━━━━━━━\n"
     text += "🎯 <i>Keep solving challenges to climb the ranks!</i>"
     
-    await message.answer(text, parse_mode="HTML")
+    if image_bytes:
+        photo = types.BufferedInputFile(image_bytes, filename="ranking.png")
+        await message.answer_photo(photo=photo, caption=text, parse_mode="HTML")
+    else:
+        await message.answer(text, parse_mode="HTML")
