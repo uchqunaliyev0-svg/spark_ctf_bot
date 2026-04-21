@@ -1,5 +1,5 @@
 from aiogram import Router, types, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from database import get_user, add_user
@@ -10,8 +10,9 @@ router = Router()
 class Registration(StatesGroup):
     waiting_for_nickname = State()
 
-@router.message(CommandStart())
+@router.message(StateFilter("*"), CommandStart())
 async def start_cmd(message: types.Message, state: FSMContext):
+    await state.clear()
     user = await get_user(message.from_user.id)
     if user:
         await message.answer(f"Welcome back, **{user['nickname']}**!", reply_markup=get_main_menu(), parse_mode="Markdown")
