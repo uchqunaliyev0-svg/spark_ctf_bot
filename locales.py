@@ -26,10 +26,11 @@ texts = {
         "ranking_title": "🏆 <b>Global Leaderboard</b>\n━━━━━━━━━━━━━━━━━━\n\n",
         "ranking_footer": "\n━━━━━━━━━━━━━━━━━━\n🎯 <i>Keep solving challenges to climb the ranks!</i>",
         
-        "info_text": "<b>SPARK CTF PLATFORM</b>\n\n<b>Flag Format:</b> <code>SPARK{flag_here}</code>\n<b>Edit Nickname:</b> /rename\n\n<b>Developer:</b> @uchqun_aliyev\n<b>Status:</b> Secure Connection",
+        "info_text": "<b>SPARK CTF PLATFORM</b>\n\n<b>Flag Format:</b> <code>SPARK{flag_here}</code>\n<b>Edit Nickname:</b> /rename\n<b>Change Language:</b> /language\n\n<b>Developer:</b> @uchqun_aliyev\n<b>Status:</b> Secure Connection",
         
         "rename_prompt": "📝 Enter your <b>new hacker nickname:</b>",
-        "rename_success": "✅ Your nickname has been updated to: <b>{}</b>"
+        "rename_success": "✅ Your nickname has been updated to: <b>{}</b>",
+        "lang_changed": "✅ Language has been successfully changed!"
     },
     "ru": {
         "welcome": "👋 <b>Добро пожаловать в Spark CTF!</b>\nВы еще не зарегистрированы. Пожалуйста, введите ваш <b>Никнейм</b>:",
@@ -56,10 +57,11 @@ texts = {
         "ranking_title": "🏆 <b>Глобальный Рейтинг</b>\n━━━━━━━━━━━━━━━━━━\n\n",
         "ranking_footer": "\n━━━━━━━━━━━━━━━━━━\n🎯 <i>Решайте задачи, чтобы подняться в рейтинге!</i>",
         
-        "info_text": "<b>SPARK CTF ПЛАТФОРМА</b>\n\n<b>Формат флага:</b> <code>SPARK{flag_here}</code>\n<b>Изменить ник:</b> /rename\n\n<b>Разработчик:</b> @uchqun_aliyev\n<b>Статус:</b> Защищенное соединение",
+        "info_text": "<b>SPARK CTF ПЛАТФОРМА</b>\n\n<b>Формат флага:</b> <code>SPARK{flag_here}</code>\n<b>Изменить ник:</b> /rename\n<b>Сменить язык:</b> /language\n\n<b>Разработчик:</b> @uchqun_aliyev\n<b>Статус:</b> Защищенное соединение",
         
         "rename_prompt": "📝 Введите ваш <b>новый хакерский никнейм:</b>",
-        "rename_success": "✅ Ваш никнейм успешно изменен на: <b>{}</b>"
+        "rename_success": "✅ Ваш никнейм успешно изменен на: <b>{}</b>",
+        "lang_changed": "✅ Язык успешно изменен!"
     },
     "uz": {
         "welcome": "👋 <b>Spark CTF'ga xush kelibsiz!</b>\nSiz hali ro'yxatdan o'tmagansiz. Iltimos, <b>Hakerlik Nikingizni</b> kiriting:",
@@ -86,10 +88,11 @@ texts = {
         "ranking_title": "🏆 <b>Global Reyting</b>\n━━━━━━━━━━━━━━━━━━\n\n",
         "ranking_footer": "\n━━━━━━━━━━━━━━━━━━\n🎯 <i>Reytingda ko'tarilish uchun vazifalarni ishlashda davom eting!</i>",
         
-        "info_text": "<b>SPARK CTF PLATFORMASI</b>\n\n<b>Bayroq formati:</b> <code>SPARK{flag_here}</code>\n<b>Nikni o'zgartirish:</b> /rename\n\n<b>Dasturchi:</b> @uchqun_aliyev\n<b>Holat:</b> Himoyalangan ulanish",
+        "info_text": "<b>SPARK CTF PLATFORMASI</b>\n\n<b>Bayroq formati:</b> <code>SPARK{flag_here}</code>\n<b>Nikni o'zgartirish:</b> /rename\n<b>Tilni o'zgartirish:</b> /language\n\n<b>Dasturchi:</b> @uchqun_aliyev\n<b>Holat:</b> Himoyalangan ulanish",
         
         "rename_prompt": "📝 <b>Yangi hakerlik nikingizni</b> kiriting:",
-        "rename_success": "✅ Nikingiz muvaffaqiyatli o'zgartirildi: <b>{}</b>"
+        "rename_success": "✅ Nikingiz muvaffaqiyatli o'zgartirildi: <b>{}</b>",
+        "lang_changed": "✅ Til muvaffaqiyatli o'zgartirildi!"
     }
 }
 

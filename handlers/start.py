@@ -12,12 +12,12 @@ class Registration(StatesGroup):
     waiting_for_nickname = State()
     waiting_for_language = State()
 
-def get_language_keyboard():
+def get_language_keyboard(prefix="lang_"):
     from aiogram.utils.keyboard import InlineKeyboardBuilder
     builder = InlineKeyboardBuilder()
-    builder.button(text="🇬🇧 English", callback_data="lang_en")
-    builder.button(text="🇷🇺 Русский", callback_data="lang_ru")
-    builder.button(text="🇺🇿 O'zbekcha", callback_data="lang_uz")
+    builder.button(text="🇬🇧 English", callback_data=f"{prefix}en")
+    builder.button(text="🇷🇺 Русский", callback_data=f"{prefix}ru")
+    builder.button(text="🇺🇿 O'zbekcha", callback_data=f"{prefix}uz")
     builder.adjust(1)
     return builder.as_markup()
 
@@ -39,7 +39,7 @@ async def process_nickname(message: types.Message, state: FSMContext):
         return
     
     await state.update_data(nickname=message.text)
-    await message.answer(get_text("en", "lang_choose"), reply_markup=get_language_keyboard())
+    await message.answer(get_text("en", "lang_choose"), reply_markup=get_language_keyboard("lang_"))
     await state.set_state(Registration.waiting_for_language)
 
 @router.callback_query(Registration.waiting_for_language, F.data.startswith("lang_"))
@@ -53,3 +53,18 @@ async def process_language(callback: types.CallbackQuery, state: FSMContext):
     
     await callback.message.edit_text(get_text(lang_code, "registered").format(nickname), parse_mode="HTML")
     await callback.message.answer(get_text(lang_code, "welcome_back").format(nickname), reply_markup=get_main_menu(lang_code), parse_mode="HTML")
+
+@router.message(Command("language", "lang"))
+async def change_lang_cmd(message: types.Message):
+    user = await get_user(message.from_user.id)
+    lang = user.get('language', 'en') if user else 'en'
+    await message.answer(get_text(lang, "lang_choose"), reply_markup=get_language_keyboard("setlang_"))
+
+@router.callback_query(StateFilter("*"), F.data.startswith("setlang_"))
+async def process_change_language(callback: types.CallbackQuery):
+    lang_code = callback.data.split("_")[1]
+    await update_user_language(callback.from_user.id, lang_code)
+    user = await get_user(callback.from_user.id)
+    
+    await callback.message.edit_text(get_text(lang_code, "lang_changed"), parse_mode="HTML")
+    await callback.message.answer(get_text(lang_code, "welcome_back").format(user['nickname']), reply_markup=get_main_menu(lang_code), parse_mode="HTML")
