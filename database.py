@@ -61,7 +61,16 @@ async def get_tasks():
 
 async def get_top_users():
     async with pool.acquire() as conn:
-        return await conn.fetch("SELECT nickname, points FROM users ORDER BY points DESC LIMIT 10")
+        return await conn.fetch("SELECT user_id, nickname, points FROM users ORDER BY points DESC LIMIT 10")
+
+async def get_solve_history(user_ids):
+    async with pool.acquire() as conn:
+        return await conn.fetch("""
+            SELECT user_id, points, solved_at 
+            FROM solves 
+            WHERE user_id = ANY($1) 
+            ORDER BY solved_at ASC
+        """, user_ids)
 
 async def add_new_task(title, points, flag, file_id=None, hint=None):
     async with pool.acquire() as conn:

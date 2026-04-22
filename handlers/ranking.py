@@ -22,8 +22,15 @@ async def show_ranking(message: types.Message, state: FSMContext):
         await message.answer(get_text(lang, "ranking_empty"), parse_mode="HTML")
         return
 
-    # Jadval rasmini yaratish
-    image_bytes = generate_ranking_image(top)
+    # User IDs for solve history
+    uids = [u['user_id'] for u in top]
+    from database import get_solve_history
+    solves = await get_solve_history(uids)
+
+    # Jadval rasmlarini yaratish
+    from utils import generate_scoreboard_chart
+    bar_chart_bytes = generate_ranking_image(top)
+    line_chart_bytes = generate_scoreboard_chart(top, solves)
     
     text = get_text(lang, "ranking_title")
     
@@ -40,8 +47,14 @@ async def show_ranking(message: types.Message, state: FSMContext):
         
     text += get_text(lang, "ranking_footer")
     
-    if image_bytes:
-        photo = types.BufferedInputFile(image_bytes, filename="ranking.png")
-        await message.answer_photo(photo=photo, caption=text, parse_mode="HTML")
+    # Media group yuborish
+    media = []
+    if line_chart_bytes:
+        media.append(types.InputMediaPhoto(media=types.BufferedInputFile(line_chart_bytes, filename="line.png")))
+    if bar_chart_bytes:
+        media.append(types.InputMediaPhoto(media=types.BufferedInputFile(bar_chart_bytes, filename="bar.png"), caption=text, parse_mode="HTML"))
+    
+    if media:
+        await message.answer_media_group(media=media)
     else:
         await message.answer(text, parse_mode="HTML")
