@@ -14,7 +14,7 @@ async def init_db():
         )''')
         await conn.execute('''CREATE TABLE IF NOT EXISTS tasks (
             id SERIAL PRIMARY KEY, title TEXT, points INTEGER, flag TEXT, 
-            file_id TEXT DEFAULT NULL, hint TEXT DEFAULT NULL
+            file_id TEXT DEFAULT NULL, hint TEXT DEFAULT NULL, category TEXT DEFAULT 'General'
         )''')
         await conn.execute('''CREATE TABLE IF NOT EXISTS solves (
             id SERIAL PRIMARY KEY, user_id BIGINT, task_id INTEGER, points INTEGER, solved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -34,6 +34,9 @@ async def init_db():
         existing_columns_users = [col['column_name'] for col in columns_users]
         if 'language' not in existing_columns_users:
             await conn.execute("ALTER TABLE users ADD COLUMN language TEXT DEFAULT 'en'")
+        
+        if 'category' not in existing_columns_tasks:
+            await conn.execute("ALTER TABLE tasks ADD COLUMN category TEXT DEFAULT 'General'")
 
 async def add_user(user_id, nickname, lang='en'):
     async with pool.acquire() as conn:
@@ -59,6 +62,14 @@ async def get_tasks():
     async with pool.acquire() as conn:
         return await conn.fetch('SELECT * FROM tasks ORDER BY id ASC')
 
+async def get_categories():
+    async with pool.acquire() as conn:
+        return await conn.fetch('SELECT DISTINCT category FROM tasks ORDER BY category ASC')
+
+async def get_tasks_by_category(category):
+    async with pool.acquire() as conn:
+        return await conn.fetch('SELECT * FROM tasks WHERE category = $1 ORDER BY points ASC', category)
+
 async def get_top_users():
     async with pool.acquire() as conn:
         return await conn.fetch("SELECT user_id, nickname, points FROM users ORDER BY points DESC LIMIT 10")
@@ -72,9 +83,9 @@ async def get_solve_history(user_ids):
             ORDER BY solved_at ASC
         """, user_ids)
 
-async def add_new_task(title, points, flag, file_id=None, hint=None):
+async def add_new_task(title, points, flag, category='General', file_id=None, hint=None):
     async with pool.acquire() as conn:
-        await conn.execute('INSERT INTO tasks (title, points, flag, file_id, hint) VALUES ($1, $2, $3, $4, $5)', title, points, flag, file_id, hint)
+        await conn.execute('INSERT INTO tasks (title, points, flag, category, file_id, hint) VALUES ($1, $2, $3, $4, $5, $6)', title, points, flag, category, file_id, hint)
 
 async def delete_task_db(task_id):
     async with pool.acquire() as conn:

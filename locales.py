@@ -14,6 +14,7 @@ texts = {
         "btn_info": "ℹ️ Info",
         
         "no_tasks": "No challenges available at the moment.",
+        "select_category": "Select a category:",
         "select_task": "Select a challenge:",
         "task_format": "<b>{}</b>\nPoints: {} pts\n\nFormat: <code>SPARK{{flag_here}}</code>",
         "send_flag": "Send the flag to solve this challenge.",
@@ -45,6 +46,7 @@ texts = {
         "btn_info": "ℹ️ Инфо",
         
         "no_tasks": "На данный момент нет доступных задач.",
+        "select_category": "Выберите категорию:",
         "select_task": "Выберите задачу:",
         "task_format": "<b>{}</b>\nОчки: {} pts\n\nФормат: <code>SPARK{{flag_here}}</code>",
         "send_flag": "Отправьте флаг для решения этой задачи.",
@@ -76,6 +78,7 @@ texts = {
         "btn_info": "ℹ️ Info",
         
         "no_tasks": "Hozircha vazifalar mavjud emas.",
+        "select_category": "Kategoriyani tanlang:",
         "select_task": "Vazifani tanlang:",
         "task_format": "<b>{}</b>\nBallar: {} pts\n\nFormat: <code>SPARK{{flag_here}}</code>",
         "send_flag": "Ushbu vazifani ishlash uchun bayroqni (flag) yuboring.",
