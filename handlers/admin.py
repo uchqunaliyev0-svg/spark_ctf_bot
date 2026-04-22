@@ -3,6 +3,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from database import add_new_task, clear_all_tasks
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import ADMIN_ID
 
 router = Router()
@@ -20,7 +21,7 @@ async def start_add(message: types.Message, state: FSMContext):
     await state.clear()
     
     # Mashhur CTF kategoriyalari bilan tugmalar
-    builder = types.InlineKeyboardBuilder()
+    builder = InlineKeyboardBuilder()
     categories = ["Web", "Crypto", "Pwn", "Reverse", "Forensics", "OSINT", "Misc"]
     for cat in categories:
         builder.button(text=cat, callback_data=f"admincat_{cat}")
