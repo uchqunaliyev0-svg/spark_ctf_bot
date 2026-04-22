@@ -1,40 +1,44 @@
 from aiogram import Router, types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
-from database import get_top_users
+from database import get_top_users, get_user
 from utils import generate_ranking_image
+from locales import get_text
 
 router = Router()
 
-@router.message(StateFilter("*"), F.text == "🏆 Ranking")
+RANKING_BTNS = ["🏆 Ranking", "🏆 Рейтинг", "🏆 Reyting"]
+
+@router.message(StateFilter("*"), F.text.in_(RANKING_BTNS))
 @router.message(StateFilter("*"), Command("ranking"))
 async def show_ranking(message: types.Message, state: FSMContext):
     await state.clear()
+    user = await get_user(message.from_user.id)
+    lang = user.get('language', 'en') if user else 'en'
+    
     top = await get_top_users()
     
     if not top:
-        await message.answer("🏆 <b>Global Leaderboard</b>\n\n<i>No one is on the leaderboard yet...</i>", parse_mode="HTML")
+        await message.answer(get_text(lang, "ranking_empty"), parse_mode="HTML")
         return
 
     # Jadval rasmini yaratish
     image_bytes = generate_ranking_image(top)
     
-    text = "🏆 <b>Global Leaderboard</b>\n"
-    text += "━━━━━━━━━━━━━━━━━━\n\n"
+    text = get_text(lang, "ranking_title")
     
     medals = ["🥇", "🥈", "🥉"]
-    for i, user in enumerate(top):
+    for i, u in enumerate(top):
         rank = medals[i] if i < 3 else f"  <b>{i + 1}.</b>"
-        nickname = user['nickname']
+        nickname = u['nickname']
         if nickname:
             nickname = nickname.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         else:
             nickname = "Unknown"
-        points = user['points']
+        points = u['points']
         text += f"{rank}  <b>{nickname}</b>  •  {points} pts\n"
         
-    text += "\n━━━━━━━━━━━━━━━━━━\n"
-    text += "🎯 <i>Keep solving challenges to climb the ranks!</i>"
+    text += get_text(lang, "ranking_footer")
     
     if image_bytes:
         photo = types.BufferedInputFile(image_bytes, filename="ranking.png")
