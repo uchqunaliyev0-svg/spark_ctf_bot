@@ -14,7 +14,7 @@ class AddTask(StatesGroup):
     waiting_for_file = State()
     waiting_for_flag = State()
 
-@router.message(Command("addtask"))
+@router.message(StateFilter("*"), Command("addtask"))
 async def start_add(message: types.Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID: return
     await state.clear()
@@ -85,7 +85,7 @@ async def proc_flag(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(f"✅ <b>Task Created successfully!</b>\n\nTitle: {data['title']}\nCategory: {data['category']}", parse_mode="HTML")
 
-@router.message(Command("clear_garbage"))
+@router.message(StateFilter("*"), Command("clear_garbage"))
 async def clear_garbage(message: types.Message):
     if message.from_user.id == ADMIN_ID:
         await clear_all_tasks()
