@@ -1,9 +1,10 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import io
 
-def generate_ranking_image(top_users):
+def create_ranking_diagram():
+    top_users = [{'nickname': 'Uchqun', 'points': 1500}, {'nickname': 'User2', 'points': 1200}, {'nickname': 'User3', 'points': 1000}, {'nickname': 'Hacker', 'points': 800}]
+    
     if not top_users:
         return None
         
@@ -39,11 +40,10 @@ def generate_ranking_image(top_users):
     ax.tick_params(axis='y', colors='white', labelsize=12)
     ax.tick_params(axis='x', colors='#94a3b8')
     
-    plt.title("SPARK CTF SCOREBOARD", color='white', pad=20, fontsize=16, fontweight='bold')
+    plt.title("🏆 SPARK CTF SCOREBOARD", color='white', pad=20, fontsize=16, fontweight='bold')
     
     plt.tight_layout()
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', facecolor='#0f172a', dpi=200)
-    buf.seek(0)
-    plt.close(fig)
-    return buf.getvalue()
+    plt.savefig("test_diagram.png", format='png', bbox_inches='tight', facecolor='#0f172a', dpi=200)
+    print("Saved test_diagram.png")
+
+create_ranking_diagram()
