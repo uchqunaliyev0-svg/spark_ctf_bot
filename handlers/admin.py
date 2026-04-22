@@ -3,9 +3,9 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from database import add_new_task, clear_all_tasks
+from config import ADMIN_ID
 
 router = Router()
-ADMIN_ID = 1894004023
 
 class AddTask(StatesGroup):
     waiting_for_category = State()

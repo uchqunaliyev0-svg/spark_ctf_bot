@@ -4,9 +4,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database import get_tasks, delete_task_db, pool, get_user
 from locales import get_text
+from config import ADMIN_ID
 
 router = Router()
-ADMIN_ID = 1894004023
 
 CHALLENGES_BTNS = ["🎯 Challenges", "🎯 Задачи", "🎯 Vazifalar"]
 

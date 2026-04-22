@@ -68,3 +68,7 @@ async def process_change_language(callback: types.CallbackQuery):
     
     await callback.message.edit_text(get_text(lang_code, "lang_changed"), parse_mode="HTML")
     await callback.message.answer(get_text(lang_code, "welcome_back").format(user['nickname']), reply_markup=get_main_menu(lang_code), parse_mode="HTML")
+
+@router.message(Command("myid"))
+async def my_id_handler(message: types.Message):
+    await message.answer(f"Your Telegram ID: <code>{message.from_user.id}</code>", parse_mode="HTML")
