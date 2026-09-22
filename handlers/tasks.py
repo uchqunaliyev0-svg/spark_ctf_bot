@@ -2,7 +2,8 @@ from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from database import get_tasks, delete_task_db, pool, get_user
+import database
+from database import get_tasks, delete_task_db, get_user
 from locales import get_text
 from config import ADMIN_ID
 
@@ -68,7 +69,7 @@ async def view_task(callback: types.CallbackQuery, bot: Bot):
     lang = user.get('language', 'en') if user else 'en'
     
     task_id = int(callback.data.split("_")[1])
-    async with pool.acquire() as conn:
+    async with database.pool.acquire() as conn:
         t = await conn.fetchrow("SELECT * FROM tasks WHERE id = $1", task_id)
     
     if not t:
@@ -103,7 +104,7 @@ async def check_flag(message: types.Message, state: FSMContext):
     user = await get_user(message.from_user.id)
     lang = user.get('language', 'en') if user else 'en'
     
-    async with pool.acquire() as conn:
+    async with database.pool.acquire() as conn:
         task = await conn.fetchrow("SELECT * FROM tasks WHERE flag = $1", message.text.strip())
         if not task:
             await message.answer(get_text(lang, "wrong_flag"), parse_mode="HTML")
