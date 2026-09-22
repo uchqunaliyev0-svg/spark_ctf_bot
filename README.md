@@ -16,15 +16,18 @@ competitions with real-time scoreboard and rating system.
 
 - Python
 - Aiogram
-- SQLite
+- PostgreSQL (asyncpg) — masalan, bepul [Neon](https://neon.tech)
 - FSM (Finite State Machine)
 
 ## 🚀 Getting Started
 
 1. Clone the repo
 2. Install requirements: `pip install -r requirements.txt`
-3. Add your token to `config.py`
-4. Run: `python main.py`
+3. Set environment variables:
+   - `BOT_TOKEN` — token from @BotFather
+   - `ADMIN_ID` — your Telegram user ID
+   - `DATABASE_URL` — PostgreSQL connection string (e.g. from Neon)
+4. Run: `python main.py` (tables are created automatically)
 
 ## 👨‍💻 Developer
 

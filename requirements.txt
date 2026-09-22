@@ -2,4 +2,3 @@ aiogram
 matplotlib
 asyncpg
 pydantic
-matplotlib

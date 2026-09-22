@@ -1,12 +1,22 @@
 import asyncpg
 import os
+from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 pool = None
 
+def _clean_url(url):
+    # Neon kabi xizmatlar URL'ga channel_binding qo'shadi, asyncpg uni tushunmaydi
+    parts = urlsplit(url)
+    query = [(k, v) for k, v in parse_qsl(parts.query) if k != "channel_binding"]
+    return urlunsplit(parts._replace(query=urlencode(query)))
+
 async def init_db():
     global pool
-    pool = await asyncpg.create_pool(DATABASE_URL)
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL muhit o'zgaruvchisi o'rnatilmagan!")
+    # statement_cache_size=0 - Neon/Supabase pooler (pgbouncer) bilan ishlashi uchun
+    pool = await asyncpg.create_pool(_clean_url(DATABASE_URL), statement_cache_size=0)
     async with pool.acquire() as conn:
         # Jadvallarni yaratish
         await conn.execute('''CREATE TABLE IF NOT EXISTS users (
