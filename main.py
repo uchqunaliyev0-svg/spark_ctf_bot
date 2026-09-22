@@ -4,10 +4,14 @@ from aiogram import Bot, Dispatcher
 from handlers import start, profile, tasks, ranking, admin, info, rename
 from database import init_db
 from middlewares.throttling import ThrottlingMiddleware
+from keep_alive import keep_alive
 
 from config import TOKEN
 
 async def main():
+    # Render bepul tarifi ochiq port talab qiladi + botni uxlatmaslik uchun
+    keep_alive()
+
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
     
